@@ -47,7 +47,7 @@ socketTo2 = create_socket("127.0.0.1", 8002)
 socketTo4 = create_socket("127.0.0.1", 8004)
 
 # 2. Read in and store the forwarding table.
-forwarding_table = read_csv("router_1_table.csv")
+forwarding_table = read_csv("input/router_1_table.csv")
 
 # 3. Store the default gateway port.
 default_gateway_port = find_default_gateway(forwarding_table)
@@ -56,7 +56,7 @@ default_gateway_port = find_default_gateway(forwarding_table)
 forwarding_table_with_range = generate_forwarding_table_with_range(forwarding_table)
 
 # 5. Read in and store the packets.
-packets_table = read_csv("packets.csv")
+packets_table = read_csv("input/packets.csv")
 
 # 6. For each packet,
 for packet in packets_table:
@@ -89,20 +89,27 @@ for packet in packets_table:
     # (b) append the payload to out_router_1.txt without forwarding because this router is the last hop, or
     # (c) append the new packet to discarded_by_router_1.txt and do not forward the new packet
 
-    if sendTo == "8002":
+    if sendTo == "8002" and new_ttl != 0:
         print("sending packet", new_packet, "to Router 2")
-        ## ... 
+        socketTo2.send(new_packet.encode())
+        ## ...
         
-    elif sendTo == "8004":
+    elif sendTo == "8004" and new_ttl != 0:
         print("sending packet", new_packet, "to Router 4")
+        socketTo4.send(new_packet.encode())
         ## ...
-        
-    elif sendTo == default_gateway_port:
+
+    elif sendTo == default_gateway_port and new_ttl != 0:
+        f = open("output/out_router_1.txt", "a")
+        f.write(payload + "\n")
+        f.close()
         print("OUT:", payload)
-        ## ...
+
     else:
         print("DISCARD:", new_packet)
-        ## ...
+        f = open("output/discarded_by_router_1.txt", "a")
+        f.write(new_packet)
+        f.close()
 
 
     # Sleep for some time before sending the next packet (for debugging purposes)
