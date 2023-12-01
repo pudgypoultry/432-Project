@@ -1,14 +1,15 @@
-from socket import *
+import socket
 import sys
 
 
 # The purpose of this function is to set up a socket connection.
 def create_socket(host, port):
     # 1. Create a socket.
-    soc = socket(AF_INET, SOCK_STREAM)
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     # 2. Try connecting the socket to the host and port.
     try:
-        soc.connect((host, port))
+        soc.bind((host, port))
     except:
         print("Connection Error to", port)
         sys.exit()
@@ -81,12 +82,14 @@ def ip_to_bin(ip : str):
 def find_ip_range(network_dst, netmask):
     # 1. Perform a bitwise AND on the network destination and netmask
     # to get the minimum IP address in the range.
-    bitwise_and = network_dst & netmask
+    dest_bin = int(network_dst, 2)
+    netmask_bin = int(netmask, 2)
+    bitwise_and = dest_bin & netmask_bin
 
     # 2. Perform a bitwise NOT on the netmask to get the number of total IPs in this range.
     # Because the built-in bitwise NOT or compliment operator (~) works with signed ints,
     # we need to create our own bitwise NOT operator for our unsigned int (a netmask).
-    compliment = bit_not(netmask)
+    compliment = bit_not(netmask_bin)
     min_ip = bitwise_and
 
     # 3. Add the total number of IPs to the minimum IP
@@ -167,4 +170,3 @@ def receive_packet(connection, max_buffer_size):
     packet = decoded_packet.split(",")
     # 5. Return the list representation of the packet.
     return packet
-
