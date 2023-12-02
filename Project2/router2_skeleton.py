@@ -141,6 +141,7 @@ def processing_thread(connection, ip, port, forwarding_table_with_range, default
             f.write(payload + "\n")
             f.close()
             print("OUT:", payload)
+            #poop
 
         else:
             print("DISCARD:", new_packet)

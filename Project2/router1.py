@@ -44,10 +44,11 @@ for f in files:
 
 # 1. Connect to the appropriate sending ports (based on the network topology diagram).
 print("Router 1 creating sockets")
-socketTo2 = create_socket("127.0.0.1", 8002)
-socketTo2.connect(("127.0.0.1", 8002))
-socketTo4 = create_socket("127.0.0.1", 8004)
-socketTo4.connect(("127.0.0.1", 8004))
+socketTo2 = create_socket("127.0.0.1", 8002, True)
+# socketTo2.connect(("127.0.0.1", 8002))
+
+socketTo4 = create_socket("127.0.0.1", 8004, True)
+# socketTo4.connect(("127.0.0.1", 8004))
 
 # 2. Read in and store the forwarding table.
 print("Router 1 reading in forwarding table")
@@ -87,7 +88,10 @@ for packet in packets_table:
     sendTo = -1
     for item in forwarding_table_with_range:
         if destinationIP_int >= item[4] and destinationIP_int <= item[5]:
-            sendTo = item[3]
+            print("Send to:")
+            sendTo = item[3].strip()
+            print(sendTo)
+            break
 
     # 10. If no port is found, then set the sending port to the default port.
     if sendTo == -1:

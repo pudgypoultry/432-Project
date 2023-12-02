@@ -76,8 +76,8 @@ def start_server():
     while True:
         # 8. Accept the connection.
         connection, address = soc.accept()
-        ip, port = soc.getpeername()
-        print("Connected with " + ip + ":" + port)
+        ip, port = address
+        print("Connected with " + str(ip) + ":" + str(port))
 
         # 9. Start a new thread for receiving and processing the incoming packets.
         try:
@@ -96,7 +96,7 @@ def processing_thread(connection, ip, port, forwarding_table_with_range, default
     # 2. Continuously process incoming packets
     while True:
         # 3. Receive the incoming packet, process it, and store its list representation
-        packet = receive_packet(con, max_buffer_size)
+        packet = receive_packet(con, max_buffer_size, 5)
         sendTo = -1
 
         # 4. If the packet is empty (Router 1 has finished sending all packets), break out of the processing loop
@@ -106,8 +106,8 @@ def processing_thread(connection, ip, port, forwarding_table_with_range, default
         # 5. Store the source IP, destination IP, payload, and TTL.
         sourceIP = packet[0]
         destinationIP = packet[1]
-        payload = packet[3]
-        ttl = packet[4]
+        payload = packet[2]
+        ttl = packet[3]
 
         # 6. Decrement the TTL by 1 and construct a new packet with the new TTL.
         new_ttl = str(int(ttl) - 1)
@@ -120,7 +120,7 @@ def processing_thread(connection, ip, port, forwarding_table_with_range, default
         # 8. Find the appropriate sending port to forward this new packet to.
         for item in forwarding_table_with_range:
             if destinationIP_int >= item[4] and destinationIP_int <= item[5]:
-                sendTo = item[3]
+                sendTo = item[3].strip()
 
         # 9. If no port is found, then set the sending port to the default port.
         if sendTo == -1:

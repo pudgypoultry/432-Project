@@ -19,13 +19,12 @@ thread4 = Thread(target = execute_python_file, args = ["router4.py"])
 thread5 = Thread(target = execute_python_file, args = ["router5.py"])
 thread6 = Thread(target = execute_python_file, args = ["router6.py"])
 
-thread1.start()
-thread4.start()
 thread6.start()
 thread5.start()
+thread4.start()
 thread3.start()
-
 thread2.start()
+thread1.start()
 
 
 
